@@ -1,5 +1,6 @@
 import "./globals.css";
 import AppLayout from "@/components/AppLayout";
+import AuthProvider from "@/components/AuthProvider";
 
 export const metadata = {
   title: "BabyTips - Sistema de Administracion Pediatrica",
@@ -10,7 +11,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <body className="antialiased">
-        <AppLayout>{children}</AppLayout>
+        <AuthProvider>
+          <AppLayout>{children}</AppLayout>
+        </AuthProvider>
       </body>
     </html>
   );

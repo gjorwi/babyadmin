@@ -36,8 +36,8 @@ export default function Sidebar({ open, onClose }) {
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <Link href="/" className="flex items-center gap-3" onClick={onClose}>
-            <div className="w-10 h-10 rounded-xl gradient-pink-cyan flex items-center justify-center">
-              <Baby className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 rounded-xl overflow-hidden bg-white shadow-sm">
+              <img src="/logo.png" alt="BabyTips Logo" className="w-full h-full object-cover" />
             </div>
             <div>
               <h1 className="text-lg font-bold leading-tight">
