@@ -1,26 +1,117 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --baby-pink: #E91E8C;
+  --baby-pink-light: #FDE8F4;
+  --baby-pink-hover: #D4187F;
+  --baby-cyan: #00BCD4;
+  --baby-cyan-light: #E0F7FA;
+  --baby-cyan-hover: #00ACC1;
+  --baby-purple: #7C4DFF;
+  --background: #F8FAFC;
+  --foreground: #1E293B;
+  --sidebar-bg: #FFFFFF;
+  --card-bg: #FFFFFF;
+  --border: #E2E8F0;
+  --muted: #94A3B8;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #CBD5E1 transparent;
+}
+
+input, select, textarea {
+  outline: none;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--baby-cyan);
+  box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.15);
+}
+
+.gradient-pink-cyan {
+  background: linear-gradient(135deg, var(--baby-pink), var(--baby-cyan));
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-link {
+  transition: all 0.2s ease;
+}
+
+.sidebar-link:hover {
+  background: var(--baby-cyan-light);
+  color: var(--baby-cyan);
+}
+
+.sidebar-link.active {
+  background: linear-gradient(135deg, rgba(233,30,140,0.1), rgba(0,188,212,0.1));
+  color: var(--baby-cyan);
+  border-right: 3px solid var(--baby-cyan);
+  font-weight: 600;
+}
+
+.table-row:hover {
+  background: #F1F5F9;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--baby-pink), var(--baby-cyan));
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 188, 212, 0.3);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: #F1F5F9;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.modal-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease forwards;
 }
