@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Plus, Edit, Trash2, Clock, CheckCircle, XCircle, Users } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Edit, Trash2, Clock, CheckCircle, XCircle, Users, Search } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import Modal from "@/components/Modal";
-import { citas as initialCitas, pacientes } from "@/lib/mockData";
+import { citas as initialCitas, pacientes, padres, pacientePadres } from "@/lib/mockData";
 import { formatDate, calcularEdad } from "@/lib/utils";
 
 export default function CitasPage() {
@@ -15,6 +15,9 @@ export default function CitasPage() {
   const [editingCita, setEditingCita] = useState(null);
   const [selectedCita, setSelectedCita] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [patientSearch, setPatientSearch] = useState("");
+  const [filteredPatients, setFilteredPatients] = useState([]);
+  const [showPatientList, setShowPatientList] = useState(false);
 
   const emptyCita = {
     id_paciente: "",
@@ -26,6 +29,41 @@ export default function CitasPage() {
   };
 
   const [form, setForm] = useState(emptyCita);
+
+  const searchPatients = (query) => {
+    setPatientSearch(query);
+    if (!query.trim()) {
+      setFilteredPatients([]);
+      setShowPatientList(false);
+      return;
+    }
+
+    const searchLower = query.toLowerCase();
+    const results = pacientes.filter(p => {
+      // Search by patient name
+      const fullName = `${p.nombre} ${p.apellidos}`.toLowerCase();
+      if (fullName.includes(searchLower)) return true;
+
+      // Search by parent cedula
+      const parentRels = pacientePadres.filter(pp => pp.id_paciente === p.id_paciente);
+      const parentIds = parentRels.map(pr => pr.id_padre);
+      const patientParents = padres.filter(padre => parentIds.includes(padre.id_padre));
+      
+      return patientParents.some(padre => 
+        padre.cedula?.toLowerCase().includes(searchLower) ||
+        padre.nombre?.toLowerCase().includes(searchLower)
+      );
+    });
+
+    setFilteredPatients(results);
+    setShowPatientList(true);
+  };
+
+  const selectPatient = (patient) => {
+    setForm({ ...form, id_paciente: String(patient.id_paciente) });
+    setPatientSearch(`${patient.nombre} ${patient.apellidos}`);
+    setShowPatientList(false);
+  };
 
   const getDaysInMonth = (date) => {
     const year = date.getFullYear();
@@ -90,6 +128,10 @@ export default function CitasPage() {
 
   const handleEdit = (cita) => {
     setEditingCita(cita);
+    const paciente = getPaciente(cita.id_paciente);
+    if (paciente) {
+      setPatientSearch(`${paciente.nombre} ${paciente.apellidos}`);
+    }
     setForm({
       id_paciente: String(cita.id_paciente),
       fecha: cita.fecha,
@@ -161,8 +203,8 @@ export default function CitasPage() {
         title="Calendario de Citas"
         subtitle={`${citasList.length} citas registradas`}
         actions={
-          <button onClick={() => { setEditingCita(null); setForm(emptyCita); setModalOpen(true); }} className="btn-primary px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2">
-            <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Nueva Cita</span><span className="sm:hidden">Nueva</span>
+          <button onClick={() => { setEditingCita(null); setForm(emptyCita); setModalOpen(true); }} className="btn-primary p-2.5 sm:px-4 sm:py-2.5 rounded-xl text-sm font-medium flex items-center gap-2">
+            <Plus className="w-5 h-5 sm:w-4 sm:h-4" /> <span className="hidden sm:inline">Nueva Cita</span>
           </button>
         }
       />
@@ -351,18 +393,57 @@ export default function CitasPage() {
       </Modal>
 
       {/* Create/Edit Modal */}
-      <Modal open={modalOpen} onClose={() => { setModalOpen(false); setEditingCita(null); }} title={editingCita ? "Editar Cita" : "Nueva Cita"}>
+      <Modal open={modalOpen} onClose={() => { setModalOpen(false); setEditingCita(null); setPatientSearch(""); setShowPatientList(false); }} title={editingCita ? "Editar Cita" : "Nueva Cita"}>
         <div className="space-y-4">
-          <div>
+          <div className="relative">
             <label className="block text-sm font-medium mb-1">Paciente *</label>
-            <select value={form.id_paciente} onChange={(e) => setForm({ ...form, id_paciente: e.target.value })} className="w-full border border-border rounded-lg px-3 py-2 text-sm">
-              <option value="">Seleccionar paciente...</option>
-              {pacientes.map(p => (
-                <option key={p.id_paciente} value={p.id_paciente}>
-                  {p.nombre} {p.apellidos} - {calcularEdad(p.fecha_nacimiento)}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                value={patientSearch}
+                onChange={(e) => searchPatients(e.target.value)}
+                onFocus={() => patientSearch && setShowPatientList(true)}
+                className="w-full border border-border rounded-lg pl-10 pr-3 py-2 text-sm"
+                placeholder="Buscar por nombre del paciente o cédula del padre..."
+              />
+            </div>
+            {showPatientList && filteredPatients.length > 0 && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setShowPatientList(false)} />
+                <div className="absolute z-20 w-full mt-1 bg-white border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  {filteredPatients.map(p => {
+                    const parentRels = pacientePadres.filter(pp => pp.id_paciente === p.id_paciente);
+                    const parentIds = parentRels.map(pr => pr.id_padre);
+                    const patientParents = padres.filter(padre => parentIds.includes(padre.id_padre));
+                    const mainParent = patientParents.find(padre => parentRels.find(pr => pr.id_padre === padre.id_padre)?.principal) || patientParents[0];
+                    
+                    return (
+                      <button
+                        key={p.id_paciente}
+                        onClick={() => selectPatient(p)}
+                        className="w-full px-3 py-2 text-left hover:bg-gray-50 border-b border-border last:border-0"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0" style={{ background: p.sexo === "F" ? "var(--baby-pink)" : "var(--baby-cyan)" }}>
+                            {p.nombre.charAt(0)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium">{p.nombre} {p.apellidos}</p>
+                            <p className="text-xs text-muted">{calcularEdad(p.fecha_nacimiento)} • {mainParent?.nombre || "Sin padre registrado"}</p>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+            {patientSearch && filteredPatients.length === 0 && showPatientList && (
+              <div className="absolute z-20 w-full mt-1 bg-white border border-border rounded-lg shadow-lg p-4 text-center">
+                <p className="text-sm text-muted">No se encontraron pacientes</p>
+              </div>
+            )}
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>

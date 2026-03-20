@@ -151,8 +151,8 @@ export default function RecordatoriosPage() {
         title="Recordatorios"
         subtitle={`${recordatoriosList.length} recordatorios programados`}
         actions={
-          <button onClick={() => { setEditing(null); setForm(emptyRecordatorio); setModalOpen(true); }} className="btn-primary px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2">
-            <Plus className="w-4 h-4" /> Nuevo Recordatorio
+          <button onClick={() => { setEditing(null); setForm(emptyRecordatorio); setModalOpen(true); }} className="btn-primary p-2.5 sm:px-4 sm:py-2.5 rounded-xl text-sm font-medium flex items-center gap-2">
+            <Plus className="w-5 h-5 sm:w-4 sm:h-4" /> <span className="hidden sm:inline">Nuevo Recordatorio</span>
           </button>
         }
       />

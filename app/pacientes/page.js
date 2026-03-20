@@ -9,7 +9,7 @@ import { formatDate, calcularEdad } from "@/lib/utils";
 
 const emptyPaciente = {
   nombre: "", apellidos: "", fecha_nacimiento: "", sexo: "M",
-  direccion: "", telefono: "", email: "", alergias: "", tipo_sangre: "O+",
+  alergias: "", tipo_sangre: "O+",
 };
 
 const emptyPadre = {
@@ -140,7 +140,14 @@ export default function PacientesPage() {
     },
     { header: "Edad", accessor: (row) => calcularEdad(row.fecha_nacimiento) },
     { header: "Tipo Sangre", accessor: "tipo_sangre" },
-    { header: "Telefono", accessor: "telefono" },
+    { 
+      header: "Telefono", 
+      accessor: (row) => {
+        const padresPaciente = getPadres(row.id_paciente);
+        const padrePrincipal = padresPaciente.find(p => p.principal) || padresPaciente[0];
+        return padrePrincipal?.telefono || "—";
+      }
+    },
     {
       header: "Acciones",
       render: (row) => (
@@ -165,8 +172,8 @@ export default function PacientesPage() {
         title="Pacientes"
         subtitle={`${pacientes.length} pacientes registrados`}
         actions={
-          <button onClick={() => { setEditing(null); setForm(emptyPaciente); setPadresForm([{ ...emptyPadre }]); setModalOpen(true); }} className="btn-primary px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2">
-            <Plus className="w-4 h-4" /> Nuevo Paciente
+          <button onClick={() => { setEditing(null); setForm(emptyPaciente); setPadresForm([{ ...emptyPadre }]); setModalOpen(true); }} className="btn-primary p-2.5 sm:px-4 sm:py-2.5 rounded-xl text-sm font-medium flex items-center gap-2">
+            <Plus className="w-5 h-5 sm:w-4 sm:h-4" /> <span className="hidden sm:inline">Nuevo Paciente</span>
           </button>
         }
       />
@@ -203,18 +210,6 @@ export default function PacientesPage() {
             <select value={form.tipo_sangre} onChange={(e) => setForm({ ...form, tipo_sangre: e.target.value })} className="w-full border border-border rounded-lg px-3 py-2 text-sm">
               {["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"].map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Telefono</label>
-            <input type="text" value={form.telefono} onChange={(e) => setForm({ ...form, telefono: e.target.value })} className="w-full border border-border rounded-lg px-3 py-2 text-sm" placeholder="555-0000" />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium mb-1">Direccion</label>
-            <input type="text" value={form.direccion} onChange={(e) => setForm({ ...form, direccion: e.target.value })} className="w-full border border-border rounded-lg px-3 py-2 text-sm" placeholder="Direccion completa" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full border border-border rounded-lg px-3 py-2 text-sm" placeholder="correo@ejemplo.com" />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Alergias</label>
@@ -367,18 +362,6 @@ export default function PacientesPage() {
               <div className="bg-gray-50 rounded-lg p-3">
                 <p className="text-xs text-muted mb-1">Fecha de Nacimiento</p>
                 <p className="text-sm font-medium">{formatDate(selected.fecha_nacimiento)}</p>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-xs text-muted mb-1">Telefono</p>
-                <p className="text-sm font-medium">{selected.telefono}</p>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-xs text-muted mb-1">Email</p>
-                <p className="text-sm font-medium">{selected.email}</p>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-xs text-muted mb-1">Direccion</p>
-                <p className="text-sm font-medium">{selected.direccion}</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-3">
                 <p className="text-xs text-muted mb-1">Alergias</p>

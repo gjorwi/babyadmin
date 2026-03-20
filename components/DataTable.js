@@ -1,10 +1,12 @@
 "use client";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import ViewToggle from "./ViewToggle";
 
-export default function DataTable({ columns, data, onRowClick, searchPlaceholder = "Buscar...", pageSize = 8 }) {
+export default function DataTable({ columns, data, onRowClick, searchPlaceholder = "Buscar...", pageSize = 8, renderCard }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
+  const [view, setView] = useState("list");
 
   const filtered = data.filter((row) =>
     columns.some((col) => {
@@ -19,53 +21,89 @@ export default function DataTable({ columns, data, onRowClick, searchPlaceholder
   return (
     <div className="bg-white rounded-xl border border-border overflow-hidden">
       <div className="p-4 border-b border-border">
-        <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 max-w-sm">
-          <Search className="w-4 h-4 text-muted" />
-          <input
-            type="text"
-            placeholder={searchPlaceholder}
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-            className="bg-transparent text-sm flex-1 border-none"
-          />
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 flex-1 max-w-sm">
+            <Search className="w-4 h-4 text-muted" />
+            <input
+              type="text"
+              placeholder={searchPlaceholder}
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+              className="bg-transparent text-sm flex-1 border-none"
+            />
+          </div>
+          <ViewToggle view={view} onViewChange={setView} />
         </div>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-gray-50">
-              {columns.map((col, i) => (
-                <th key={i} className="text-left text-xs font-semibold text-muted uppercase tracking-wider px-4 py-3">
-                  {col.header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {paginated.length === 0 ? (
-              <tr>
-                <td colSpan={columns.length} className="text-center py-10 text-muted text-sm">
-                  No se encontraron registros
-                </td>
+      {view === "list" ? (
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-50">
+                {columns.map((col, i) => (
+                  <th key={i} className="text-left text-xs font-semibold text-muted uppercase tracking-wider px-4 py-3">
+                    {col.header}
+                  </th>
+                ))}
               </tr>
-            ) : (
-              paginated.map((row, i) => (
-                <tr
+            </thead>
+            <tbody>
+              {paginated.length === 0 ? (
+                <tr>
+                  <td colSpan={columns.length} className="text-center py-10 text-muted text-sm">
+                    No se encontraron registros
+                  </td>
+                </tr>
+              ) : (
+                paginated.map((row, i) => (
+                  <tr
+                    key={i}
+                    className={`table-row border-t border-border ${onRowClick ? "cursor-pointer" : ""}`}
+                    onClick={() => onRowClick && onRowClick(row)}
+                  >
+                    {columns.map((col, j) => (
+                      <td key={j} className="px-4 py-3 text-sm">
+                        {col.render ? col.render(row) : (typeof col.accessor === "function" ? col.accessor(row) : row[col.accessor])}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="p-4">
+          {paginated.length === 0 ? (
+            <div className="text-center py-10 text-muted text-sm">
+              No se encontraron registros
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {paginated.map((row, i) => (
+                <div
                   key={i}
-                  className={`table-row border-t border-border ${onRowClick ? "cursor-pointer" : ""}`}
+                  className={`border border-border rounded-lg p-4 hover:shadow-md transition-shadow ${onRowClick ? "cursor-pointer" : ""}`}
                   onClick={() => onRowClick && onRowClick(row)}
                 >
-                  {columns.map((col, j) => (
-                    <td key={j} className="px-4 py-3 text-sm">
-                      {col.render ? col.render(row) : (typeof col.accessor === "function" ? col.accessor(row) : row[col.accessor])}
-                    </td>
-                  ))}
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+                  {renderCard ? renderCard(row) : (
+                    <div className="space-y-2">
+                      {columns.map((col, j) => (
+                        <div key={j}>
+                          <p className="text-xs text-muted font-medium">{col.header}</p>
+                          <div className="text-sm">
+                            {col.render ? col.render(row) : (typeof col.accessor === "function" ? col.accessor(row) : row[col.accessor])}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-4 py-3 border-t border-border">
           <p className="text-sm text-muted">
