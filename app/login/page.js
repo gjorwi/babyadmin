@@ -143,9 +143,9 @@ export default function LoginPage() {
       {/* Right Side - Decorative */}
       <div className="hidden lg:flex lg:w-1/2 gradient-pink-cyan items-center justify-center p-12">
         <div className="text-center text-white max-w-lg">
-          <div className="w-32 h-32 rounded-2xl overflow-hidden bg-white/20 backdrop-blur-sm mx-auto mb-8 shadow-2xl">
+          {/* <div className="w-32 h-32 rounded-2xl overflow-hidden bg-white/20 backdrop-blur-sm mx-auto mb-8 shadow-2xl">
             <img src="/logo.png" alt="BabyTips Logo" className="w-full h-full object-cover" />
-          </div>
+          </div> */}
           <h2 className="text-4xl font-bold mb-4">Sistema de Administración Pediátrica</h2>
           <p className="text-lg opacity-90 mb-8">
             Gestione pacientes, citas, historiales médicos y más desde una plataforma moderna y eficiente.
