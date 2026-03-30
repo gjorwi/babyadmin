@@ -30,7 +30,7 @@ export default function HistorialMedicoPage() {
   const [editingItem, setEditingItem] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   
-  const emptyConsulta = { fecha: new Date().toISOString().split("T")[0], motivo: "", peso: "", talla: "", perimetro_cefalico: "", diagnostico: "", tratamiento: "", observaciones: "" };
+  const emptyConsulta = { fecha: new Date().toISOString().split("T")[0], motivo: "", peso: "", talla: "", perimetro_cefalico: "", diagnostico: "", tratamiento: "", observaciones: "", monto: "", moneda: "dolar", tipo_pago: "fisico", metodo_pago: "contado" };
   const emptyVacuna = { nombre: "", fecha_aplicacion: new Date().toISOString().split("T")[0], dosis: "", lote: "", proxima_dosis: "" };
   const emptyReceta = { medicamento: "", dosis: "", frecuencia: "", duracion: "", indicaciones: "" };
   const emptyLab = { prueba: "", fecha_orden: new Date().toISOString().split("T")[0], fecha_resultado: "", resultado: "", foto_resultado: "" };
@@ -781,6 +781,41 @@ export default function HistorialMedicoPage() {
           <div>
             <label className="block text-sm font-medium mb-1">Observaciones</label>
             <textarea value={consultaForm.observaciones} onChange={(e) => setConsultaForm({ ...consultaForm, observaciones: e.target.value })} className="w-full border border-border rounded-lg px-3 py-2 text-sm" rows={2} />
+          </div>
+
+          <div className="border-t border-border pt-4 mt-4">
+            <h4 className="font-semibold mb-3 text-sm">Información de Facturación</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Monto de Consulta</label>
+                <input type="number" step="0.01" value={consultaForm.monto} onChange={(e) => setConsultaForm({ ...consultaForm, monto: e.target.value })} className="w-full border border-border rounded-lg px-3 py-2 text-sm" placeholder="0.00" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Moneda</label>
+                <select value={consultaForm.moneda} onChange={(e) => setConsultaForm({ ...consultaForm, moneda: e.target.value })} className="w-full border border-border rounded-lg px-3 py-2 text-sm">
+                  <option value="dolar">Dólares (USD)</option>
+                  <option value="bolivares">Bolívares (Bs.)</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-3">
+              <div>
+                <label className="block text-sm font-medium mb-1">Método de Pago</label>
+                <select value={consultaForm.metodo_pago} onChange={(e) => setConsultaForm({ ...consultaForm, metodo_pago: e.target.value })} className="w-full border border-border rounded-lg px-3 py-2 text-sm">
+                  <option value="contado">De Contado</option>
+                  <option value="credito">A Crédito</option>
+                  <option value="mixto">Mixto</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Tipo de Pago</label>
+                <select value={consultaForm.tipo_pago} onChange={(e) => setConsultaForm({ ...consultaForm, tipo_pago: e.target.value })} className="w-full border border-border rounded-lg px-3 py-2 text-sm">
+                  <option value="fisico">Efectivo</option>
+                  <option value="transferencia">Transferencia</option>
+                  <option value="pago_movil">Pago Móvil</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
         <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-border">

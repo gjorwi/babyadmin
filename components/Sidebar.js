@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, UserRound, CalendarDays, Stethoscope,
-  Syringe, FileText, FlaskConical, BookOpen, Bell, BarChart3, Settings, Baby, X, Clock
+  Syringe, FileText, FlaskConical, BookOpen, Bell, BarChart3, Settings, Baby, X, Clock, DollarSign
 } from "lucide-react";
 
 const menuItems = [
@@ -11,6 +11,7 @@ const menuItems = [
   { href: "/pacientes", label: "Pacientes", icon: Baby },
   { href: "/citas", label: "Citas", icon: CalendarDays },
   { href: "/historial", label: "Historial Medico", icon: Stethoscope },
+  { href: "/facturas", label: "Facturacion", icon: DollarSign },
   { href: "/recordatorios", label: "Recordatorios", icon: Clock },
   { href: "/reportes", label: "Reportes", icon: BarChart3 },
   { href: "/configuracion", label: "Configuracion", icon: Settings },
